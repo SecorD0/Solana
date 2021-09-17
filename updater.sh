@@ -6,7 +6,7 @@ else
 	echo -e "\033[0;31mYou didn't specify a version\e[0m"
 	exit 1
 fi
-if [ ! -f /etc/systemd/system/sys_tunerd.service ]; then
+if [ ! -f /etc/systemd/system/sstd.service ]; then
 	sudo tee <<EOF >/dev/null /etc/systemd/system/sstd.service
 [Unit]
 Description=Solana System Tuning
