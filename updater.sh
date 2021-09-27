@@ -1,7 +1,7 @@
 #!/bin/bash
 # Default variables
-sudo apt install jq -y &>/dev/null
-solana_version=`curl -s https://api.github.com/repos/solana-labs/solana/releases/latest | jq -r ".tag_name" | sed "s%v%%g"`
+sudo apt install wget jq -y &>/dev/null
+solana_version=`wget -qO- https://api.github.com/repos/solana-labs/solana/releases/latest | jq -r ".tag_name" | sed "s%v%%g"`
 # Options
 . <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/colors.sh) --
 option_value(){ echo "$1" | sed -e 's%^--[^=]*=%%g; s%^-[^=]*=%%g'; }
