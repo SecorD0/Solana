@@ -27,7 +27,7 @@ while test $# -gt 0; do
 		echo -e "https://github.com/SecorD0/Solana/blob/main/auto_restarter.sh - script URL"
 		echo -e "https://t.me/letskynode — node Community"
 		echo
-		return 0
+		return 0; exit 0
 		;;
 	-cp*|--crit-percent*)
 		if ! grep -q "=" <<< "$1"; then shift; fi
@@ -75,9 +75,9 @@ EOF
 	sudo systemctl enable "$service_name"
 	sudo systemctl daemon-reload
 	sudo systemctl restart "$service_name"
-	return 0
+	return 0; exit 0
 fi
 if [ `bc <<< "$crit_percent<$(free | awk 'NR == 2 {printf("%.2f\n"), $3/$2*100}')"` -eq "1" ]; then
-	"`which solana-validator`" --help
-	"`which solana-validator`" --ledger $HOME/solana/ledger/ wait-for-restart-window
+	/root/.local/share/solana/install/active_release/bin/solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window && \
+	sudo systemctl restart solana
 fi
