@@ -52,17 +52,20 @@ if ! dpkg -s bc | grep -q "ok installed"; then
 	sudo apt upgrade
 	sudo apt install bc
 fi
-if [ ! -f /etc/systemd/system/$service_name.service ]; then
+if [ ! -f /etc/systemd/system/$service_name.service ] || ! cat /etc/systemd/system/$service_name.service | grep -q "$crit_percent"; then
+	solana_dir=`cat /etc/systemd/system/solana.service | grep -oPm1 "(?<=--ledger )([^%]+)(?=ledger)"`
 	sudo tee <<EOF >/dev/null /etc/systemd/system/$service_name.service
 [Unit]
 Description=Solana auto-updater
 After=network.target
-Before=solana.service
+RequiresMountsFor=${solana_dir}
 
 [Service]
 type=oneshot
 User=$USER
-ExecStart=. <(wget -qO- https://raw.githubusercontent.com/SecorD0/Solana/main/auto_restarter.sh) -cp "${crit_percent}"
+ExecStartPre=`which wget` -qO ${solana_dir}auto_restarter.sh https://raw.githubusercontent.com/SecorD0/Solana/main/auto_restarter.sh
+ExecStartPre=`which chmod` +x ${solana_dir}auto_restarter.sh
+ExecStart=${solana_dir}auto_restarter.sh -cp "${crit_percent}"
 Restart=always
 RestartSec=5m
 
@@ -75,6 +78,6 @@ EOF
 	return 0
 fi
 if [ `bc <<< "$crit_percent<$(free | awk 'NR == 2 {printf("%.2f\n"), $3/$2*100}')"` -eq "1" ]; then
-	solana-validator --ledger ~/solana/ledger/ wait-for-restart-window
+	"`which solana-validator`" --ledger $HOME/solana/ledger/ wait-for-restart-window
 	systemctl restart solana
 fi
