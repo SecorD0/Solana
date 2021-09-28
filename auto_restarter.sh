@@ -78,6 +78,6 @@ EOF
 	return 0
 fi
 if [ `bc <<< "$crit_percent<$(free | awk 'NR == 2 {printf("%.2f\n"), $3/$2*100}')"` -eq "1" ]; then
+	"`which solana-validator`" --help
 	"`which solana-validator`" --ledger $HOME/solana/ledger/ wait-for-restart-window
-	systemctl restart solana
 fi
