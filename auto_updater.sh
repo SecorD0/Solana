@@ -39,6 +39,10 @@ while test $# -gt 0; do
 		service_name=`option_value "$1"`
 		shift
 		;;
+	-u|--uninstall)
+		uninstall="true"
+		shift
+		;;
 	*|--)
 		break
 		;;
