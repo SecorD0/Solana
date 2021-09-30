@@ -2,6 +2,7 @@
 # Default variables
 crit_percent="90.00"
 service_name="sard"
+uninstall="false"
 # Options
 . <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/colors.sh) --
 option_value(){ echo "$1" | sed -e 's%^--[^=]*=%%g; s%^-[^=]*=%%g'; }
@@ -22,6 +23,7 @@ while test $# -gt 0; do
 		echo -e "  -h,  --help                 show the help page"
 		echo -e "  -cp, --crit-percent NUMBER  float or integer value of critical percentage of memory usage"
 		echo -e "  -sn, --service-name NAME    service file NAME (default is '${C_LGn}${service_name}${RES}')"
+		echo -e "  -u,  --uninstall            uninstall the auto-restarting"
 		echo
 		echo -e "${C_LGn}Useful URLs${RES}:"
 		echo -e "https://github.com/SecorD0/Solana/blob/main/auto_restarter.sh - script URL"
@@ -39,6 +41,10 @@ while test $# -gt 0; do
 		service_name=`option_value "$1"`
 		shift
 		;;
+	-u|--uninstall)
+		uninstall="true"
+		shift
+		;;
 	*|--)
 		break
 		;;
@@ -47,13 +53,19 @@ done
 # Functions
 printf_n(){ printf "$1\n" "${@:2}"; }
 # Actions
-if ! dpkg -s bc | grep -q "ok installed"; then
-	sudo apt update
-	sudo apt upgrade
-	sudo apt install bc
-fi
 solana_dir=`cat /etc/systemd/system/solana.service | grep -oPm1 "(?<=--ledger )([^%]+)(?=ledger)"`
-text="[Unit]
+if [ "$uninstall" = "true" ]; then
+	sudo systemctl stop "$service_name"
+	rm -rf "/etc/systemd/system/$service_name.service" "${solana_dir}auto_restarter.sh"
+	sudo systemctl daemon-reload
+	printf_n "${C_LGn}Done!${RES}"
+else
+	if ! dpkg -s bc | grep -q "ok installed"; then
+		sudo apt update
+		sudo apt upgrade
+		sudo apt install bc
+	fi
+	text="[Unit]
 Description=Solana auto-restarter
 After=network.target solana.service
 RequiresMountsFor=${solana_dir}
@@ -69,20 +81,21 @@ RestartSec=5m
 
 [Install]
 WantedBy=multi-user.target"
-file_text=`cat /etc/systemd/system/sard.service 2>/dev/null`
-if [ "$file_text" != "$text" ]; then
-	printf_n "${C_LGn}Updating service file...${RES}"
-	printf "$text" > "/etc/systemd/system/$service_name.service"
-	sudo systemctl daemon-reload
-	sudo systemctl enable "$service_name"
-	sudo systemctl restart "$service_name"
-	printf_n "${C_LGn}Done!${RES}"
-	return 0 2>/dev/null; exit 0
-fi
-load=`free | awk 'NR == 2 {printf("%.2f\n"), $3/$2*100}'`
-if [ `bc <<< "$crit_percent<$load"` -eq "1" ]; then
-	/root/.local/share/solana/install/active_release/bin/solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window && \
-	sudo systemctl restart solana
-else
-	printf_n "The load is within ${C_LGn}normal${RES} limits: ${C_LGn}%.2f${RES} p.c." "$load"
+	file_text=`cat /etc/systemd/system/sard.service 2>/dev/null`
+	if [ "$file_text" != "$text" ]; then
+		printf_n "${C_LGn}Updating service file...${RES}"
+		printf "$text" > "/etc/systemd/system/$service_name.service"
+		sudo systemctl daemon-reload
+		sudo systemctl enable "$service_name"
+		sudo systemctl restart "$service_name"
+		printf_n "${C_LGn}Done!${RES}"
+		return 0 2>/dev/null; exit 0
+	fi
+	load=`free | awk 'NR == 2 {printf("%.2f\n"), $3/$2*100}'`
+	if [ `bc <<< "$crit_percent<$load"` -eq "1" ]; then
+		/root/.local/share/solana/install/active_release/bin/solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window && \
+		sudo systemctl restart solana
+	else
+		printf_n "The load is within ${C_LGn}normal${RES} limits: ${C_LGn}%.2f${RES} p.c." "$load"
+	fi
 fi
