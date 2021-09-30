@@ -49,9 +49,9 @@ printf_n(){ printf "$1\n" "${@:2}"; }
 printf_n "${C_LGn}Service file creating...${RES}"
 solana_dir=`cat /etc/systemd/system/solana.service | grep -oPm1 "(?<=--ledger )([^%]+)(?=ledger)"`
 if [ "$mainnet" = "true" ]; then
-	command='${solana_dir}updater.sh -m'
+	command="${solana_dir}updater.sh -m"
 else
-	command='${solana_dir}updater.sh'
+	command="${solana_dir}updater.sh"
 fi
 sudo tee <<EOF >/dev/null /etc/systemd/system/$service_name.service
 [Unit]
