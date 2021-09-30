@@ -99,4 +99,5 @@ WantedBy=multi-user.target"
 	else
 		printf_n "The load is within ${C_LGn}normal${RES} limits: ${C_LGn}%.2f${RES} p.c." "$load"
 	fi
+	return 0 2>/dev/null; exit 0
 fi
