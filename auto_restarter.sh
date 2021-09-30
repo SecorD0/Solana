@@ -69,21 +69,15 @@ RestartSec=5m
 
 [Install]
 WantedBy=multi-user.target"
-if [ ! -f /etc/systemd/system/$service_name.service ]; then
+file_text=`cat /etc/systemd/system/sard.service 2>/dev/null`
+if [ "$file_text" != "$text" ]; then
+	printf_n "${C_LGn}Updating service file...${RES}"
 	printf "$text" > "/etc/systemd/system/$service_name.service"
-	sudo systemctl enable "$service_name"
 	sudo systemctl daemon-reload
+	sudo systemctl enable "$service_name"
 	sudo systemctl restart "$service_name"
+	printf_n "${C_LGn}Done!${RES}"
 	return 0 2>/dev/null; exit 0
-else
-	file_text=`cat /etc/systemd/system/sard.service`
-	if [ "$file_text" != "$text" ]; then
-		printf "$text" > "/etc/systemd/system/$service_name.service"
-		sudo systemctl enable "$service_name"
-		sudo systemctl daemon-reload
-		sudo systemctl restart "$service_name"
-		return 0 2>/dev/null; exit 0
-	fi
 fi
 load=`free | awk 'NR == 2 {printf("%.2f\n"), $3/$2*100}'`
 if [ `bc <<< "$crit_percent<$load"` -eq "1" ]; then
