@@ -56,7 +56,7 @@ if [ ! -f /etc/systemd/system/$service_name.service ] || ! cat /etc/systemd/syst
 	solana_dir=`cat /etc/systemd/system/solana.service | grep -oPm1 "(?<=--ledger )([^%]+)(?=ledger)"`
 	sudo tee <<EOF >/dev/null /etc/systemd/system/$service_name.service
 [Unit]
-Description=Solana auto-updater
+Description=Solana auto-restarter
 After=network.target solana.service
 RequiresMountsFor=${solana_dir}
 
