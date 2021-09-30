@@ -69,7 +69,7 @@ Before=solana.service
 [Service]
 User=$USER
 ExecStart=`command -v solana-sys-tuner` --user $USER
-Restart=always
+Restart=on-failure
 RestartSec=3
 LimitNOFILE=65535
 
@@ -79,7 +79,7 @@ EOF
 		sudo systemctl enable sstd
 		sudo systemctl daemon-reload
 	fi
-	if ! solana --version | grep -q $solana_version; then
+	if ! /root/.local/share/solana/install/active_release/bin/solana --version | grep -q $solana_version; then
 		/root/.local/share/solana/install/active_release/bin/solana-install init "v${solana_version}"
 		/root/.local/share/solana/install/active_release/bin/solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window && \
 		sudo systemctl stop solana && \
