@@ -1,6 +1,6 @@
 #!/bin/bash
 # Default variables
-crit_percent="90.00"
+crit_load="90.00"
 service_name="sard"
 uninstall="false"
 # Options
@@ -13,17 +13,17 @@ while test $# -gt 0; do
 		echo
 		echo -e "${C_LGn}Functionality${RES}: the script creates service file which executes a restarting script every"
 		echo -e "${C_LGn}5${RES} minutes. The restarting script automatically checks memory usage and if it is more"
-		echo -e "than ${C_LGn}${crit_percent}${RES}%, the script gently restarts the node"
+		echo -e "than ${C_LGn}${crit_load}${RES}%, the script gently restarts the node"
 		echo
 		echo -e "${C_R}Creators aren't responsible for the script usage, so you use it at your own risk${RES}"
 		echo
 		echo -e "${C_LGn}Usage${RES}: script ${C_LGn}[OPTIONS]${RES}"
 		echo
 		echo -e "${C_LGn}Options${RES}:"
-		echo -e "  -h,  --help                 show the help page"
-		echo -e "  -cp, --crit-percent NUMBER  float or integer value of critical percentage of memory usage"
-		echo -e "  -sn, --service-name NAME    service file NAME (default is '${C_LGn}${service_name}${RES}')"
-		echo -e "  -u,  --uninstall            uninstall the auto-restarting"
+		echo -e "  -h,  --help               show the help page"
+		echo -e "  -cl, --crit-load NUMBER   float or integer value of critical load of memory usage"
+		echo -e "  -sn, --service-name NAME  service file NAME (default is '${C_LGn}${service_name}${RES}')"
+		echo -e "  -u,  --uninstall          uninstall the auto-restarting"
 		echo
 		echo -e "${C_LGn}Useful URLs${RES}:"
 		echo -e "https://github.com/SecorD0/Solana/blob/main/auto_restarter.sh - script URL"
@@ -31,9 +31,9 @@ while test $# -gt 0; do
 		echo
 		return 0 2>/dev/null; exit 0
 		;;
-	-cp*|--crit-percent*)
+	-cl*|--crit-load*)
 		if ! grep -q "=" <<< "$1"; then shift; fi
-		crit_percent=`printf "%.2f" $(option_value "$1")`
+		crit_load=`printf "%.2f" $(option_value "$1")`
 		shift
 		;;
 	-sn*|--service-name*)
@@ -75,7 +75,7 @@ type=oneshot
 User=$USER
 ExecStartPre=`which wget` -qO ${solana_dir}auto_restarter.sh https://raw.githubusercontent.com/SecorD0/Solana/main/auto_restarter.sh
 ExecStartPre=`which chmod` +x ${solana_dir}auto_restarter.sh
-ExecStart=${solana_dir}auto_restarter.sh -cp "${crit_percent}"
+ExecStart=${solana_dir}auto_restarter.sh -cp "${crit_load}"
 Restart=on-failure
 RestartSec=5m
 
@@ -92,7 +92,7 @@ WantedBy=multi-user.target"
 		return 0 2>/dev/null; exit 0
 	fi
 	load=`free | awk 'NR == 2 {printf("%.2f\n"), $3/$2*100}'`
-	if [ `bc <<< "$crit_percent<$load"` -eq "1" ]; then
+	if [ `bc <<< "$crit_load<$load"` -eq "1" ]; then
 		/root/.local/share/solana/install/active_release/bin/solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window && \
 		sudo systemctl restart solana
 	else
