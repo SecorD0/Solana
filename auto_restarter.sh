@@ -66,7 +66,7 @@ User=$USER
 ExecStartPre=`which wget` -qO ${solana_dir}auto_restarter.sh https://raw.githubusercontent.com/SecorD0/Solana/main/auto_restarter.sh
 ExecStartPre=`which chmod` +x ${solana_dir}auto_restarter.sh
 ExecStart=${solana_dir}auto_restarter.sh -cp "${crit_percent}"
-Restart=always
+Restart=on-failure
 RestartSec=5m
 
 [Install]
