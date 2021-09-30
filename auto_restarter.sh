@@ -27,7 +27,7 @@ while test $# -gt 0; do
 		echo -e "https://github.com/SecorD0/Solana/blob/main/auto_restarter.sh - script URL"
 		echo -e "https://t.me/letskynode — node Community"
 		echo
-		return 0; exit 0
+		return 0 2>/dev/null; exit 0
 		;;
 	-cp*|--crit-percent*)
 		if ! grep -q "=" <<< "$1"; then shift; fi
