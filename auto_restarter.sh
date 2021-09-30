@@ -52,10 +52,8 @@ if ! dpkg -s bc | grep -q "ok installed"; then
 	sudo apt upgrade
 	sudo apt install bc
 fi
-if [ ! -f /etc/systemd/system/$service_name.service ] || ! cat /etc/systemd/system/$service_name.service | grep -q "$crit_percent"; then
-	solana_dir=`cat /etc/systemd/system/solana.service | grep -oPm1 "(?<=--ledger )([^%]+)(?=ledger)"`
-	sudo tee <<EOF >/dev/null /etc/systemd/system/$service_name.service
-[Unit]
+solana_dir=`cat /etc/systemd/system/solana.service | grep -oPm1 "(?<=--ledger )([^%]+)(?=ledger)"`
+text="[Unit]
 Description=Solana auto-restarter
 After=network.target solana.service
 RequiresMountsFor=${solana_dir}
@@ -70,14 +68,27 @@ Restart=on-failure
 RestartSec=5m
 
 [Install]
-WantedBy=multi-user.target
-EOF
+WantedBy=multi-user.target"
+if [ ! -f /etc/systemd/system/$service_name.service ]; then
+	printf "$text" > "/etc/systemd/system/$service_name.service"
 	sudo systemctl enable "$service_name"
 	sudo systemctl daemon-reload
 	sudo systemctl restart "$service_name"
-	return 0; exit 0
+	return 0 2>/dev/null; exit 0
+else
+	file_text=`cat /etc/systemd/system/sard.service`
+	if [ "$file_text" != "$text" ]; then
+		printf "$text" > "/etc/systemd/system/$service_name.service"
+		sudo systemctl enable "$service_name"
+		sudo systemctl daemon-reload
+		sudo systemctl restart "$service_name"
+		return 0 2>/dev/null; exit 0
+	fi
 fi
-if [ `bc <<< "$crit_percent<$(free | awk 'NR == 2 {printf("%.2f\n"), $3/$2*100}')"` -eq "1" ]; then
+load=`free | awk 'NR == 2 {printf("%.2f\n"), $3/$2*100}'`
+if [ `bc <<< "$crit_percent<$load"` -eq "1" ]; then
 	/root/.local/share/solana/install/active_release/bin/solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window && \
 	sudo systemctl restart solana
+else
+	printf_n "The load is within ${C_LGn}normal${RES} limits: ${C_LGn}%.2f${RES} p.c." "$load"
 fi
