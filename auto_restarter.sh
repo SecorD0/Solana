@@ -21,7 +21,7 @@ while test $# -gt 0; do
 		echo
 		echo -e "${C_LGn}Options${RES}:"
 		echo -e "  -h,  --help               show the help page"
-		echo -e "  -cl, --crit-load NUMBER   float or integer value of critical load of memory usage"
+		echo -e "  -cl, --crit-load NUMBER   float or integer value of critical memory usage load"
 		echo -e "  -sn, --service-name NAME  service file NAME (default is '${C_LGn}${service_name}${RES}')"
 		echo -e "  -u,  --uninstall          uninstall the auto-restarting"
 		echo
