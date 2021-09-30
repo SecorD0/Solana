@@ -66,7 +66,7 @@ User=$USER
 ExecStartPre=`which wget` -qO ${solana_dir}updater.sh https://raw.githubusercontent.com/SecorD0/Solana/main/updater.sh
 ExecStartPre=`which chmod` +x ${solana_dir}updater.sh
 ExecStart=${command}
-Restart=always
+Restart=on-failure
 RestartSec=30m
 
 [Install]
