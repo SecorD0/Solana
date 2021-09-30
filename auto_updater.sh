@@ -19,9 +19,10 @@ while test $# -gt 0; do
 		echo -e "${C_LGn}Usage${RES}: script ${C_LGn}[OPTIONS]${RES}"
 		echo
 		echo -e "${C_LGn}Options${RES}:"
-		echo -e "  -h,   --help               show the help page"
-		echo -e "  -m,   --mainnet            use for mainnet node"
-		echo -e "  -sn,  --service-name NAME  service file NAME (default is '${C_LGn}${service_name}${RES}')"
+		echo -e "  -h,  --help               show the help page"
+		echo -e "  -m,  --mainnet            use for mainnet node"
+		echo -e "  -sn, --service-name NAME  service file NAME (default is '${C_LGn}${service_name}${RES}')"
+		echo -e "  -u,  --uninstall          uninstall the auto-updating"
 		echo
 		echo -e "${C_LGn}Useful URLs${RES}:"
 		echo -e "https://github.com/SecorD0/Solana/blob/main/auto_updater.sh - script URL"
@@ -48,13 +49,18 @@ printf_n(){ printf "$1\n" "${@:2}"; }
 # Actions
 printf_n "${C_LGn}Service file creating...${RES}"
 solana_dir=`cat /etc/systemd/system/solana.service | grep -oPm1 "(?<=--ledger )([^%]+)(?=ledger)"`
-if [ "$mainnet" = "true" ]; then
-	command="${solana_dir}updater.sh -m"
+if [ "$uninstall" = "true" ]; then
+	sudo systemctl stop "$service_name"
+	rm -rf "/etc/systemd/system/${service_name}.service" "${solana_dir}updater.sh"
+	sudo systemctl daemon-reload
+	printf_n "${C_LGn}Done!${RES}"
 else
-	command="${solana_dir}updater.sh"
-fi
-sudo tee <<EOF >/dev/null /etc/systemd/system/$service_name.service
-[Unit]
+	if [ "$mainnet" = "true" ]; then
+		command="${solana_dir}updater.sh -m"
+	else
+		command="${solana_dir}updater.sh"
+	fi
+	printf "[Unit]
 Description=Solana auto-updater
 After=network.target
 Before=solana.service
@@ -70,9 +76,9 @@ Restart=on-failure
 RestartSec=30m
 
 [Install]
-WantedBy=multi-user.target
-EOF
-sudo systemctl daemon-reload
-sudo systemctl enable "$service_name"
-sudo systemctl restart "$service_name"
-printf_n "${C_LGn}Done!${RES}"
+WantedBy=multi-user.target" > "/etc/systemd/system/${service_name}.service"
+	sudo systemctl daemon-reload
+	sudo systemctl enable "$service_name"
+	sudo systemctl restart "$service_name"
+	printf_n "${C_LGn}Done!${RES}"
+fi
