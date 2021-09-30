@@ -55,6 +55,7 @@ printf_n(){ printf "$1\n" "${@:2}"; }
 # Actions
 solana_dir=`cat /etc/systemd/system/solana.service | grep -oPm1 "(?<=--ledger )([^%]+)(?=ledger)"`
 if [ "$uninstall" = "true" ]; then
+	printf_n "${C_LGn}Uninstalling...${RES}"
 	sudo systemctl stop "$service_name"
 	rm -rf "/etc/systemd/system/${service_name}.service" "${solana_dir}auto_restarter.sh"
 	sudo systemctl daemon-reload
