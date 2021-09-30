@@ -56,7 +56,7 @@ printf_n(){ printf "$1\n" "${@:2}"; }
 solana_dir=`cat /etc/systemd/system/solana.service | grep -oPm1 "(?<=--ledger )([^%]+)(?=ledger)"`
 if [ "$uninstall" = "true" ]; then
 	sudo systemctl stop "$service_name"
-	rm -rf "/etc/systemd/system/$service_name.service" "${solana_dir}auto_restarter.sh"
+	rm -rf "/etc/systemd/system/${service_name}.service" "${solana_dir}auto_restarter.sh"
 	sudo systemctl daemon-reload
 	printf_n "${C_LGn}Done!${RES}"
 else
@@ -84,7 +84,7 @@ WantedBy=multi-user.target"
 	file_text=`cat /etc/systemd/system/sard.service 2>/dev/null`
 	if [ "$file_text" != "$text" ]; then
 		printf_n "${C_LGn}Updating service file...${RES}"
-		printf "$text" > "/etc/systemd/system/$service_name.service"
+		printf "$text" > "/etc/systemd/system/${service_name}.service"
 		sudo systemctl daemon-reload
 		sudo systemctl enable "$service_name"
 		sudo systemctl restart "$service_name"
