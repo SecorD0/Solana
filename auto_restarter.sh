@@ -57,7 +57,7 @@ if [ ! -f /etc/systemd/system/$service_name.service ] || ! cat /etc/systemd/syst
 	sudo tee <<EOF >/dev/null /etc/systemd/system/$service_name.service
 [Unit]
 Description=Solana auto-updater
-After=network.target
+After=network.target solana.service
 RequiresMountsFor=${solana_dir}
 
 [Service]
