@@ -87,3 +87,4 @@ EOF
 		sudo systemctl restart solana
 	fi
 fi
+return 0 2>/dev/null; exit 0
