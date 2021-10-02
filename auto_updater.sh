@@ -13,7 +13,7 @@ while test $# -gt 0; do
 		echo
 		echo -e "${C_LGn}Functionality${RES}: the script creates service file which executes an updating script. The"
 		echo -e "updating script automatically checks the version of Solana testnet/mainnet node every"
-		echo -e "30 minutes and updates the node when a new version is released"
+		echo -e "${C_LGn}30${RES} minutes and updates the node when a new version is released"
 		echo
 		echo -e "${C_R}Creators aren't responsible for the script usage, so you use it at your own risk${RES}"
 		echo
