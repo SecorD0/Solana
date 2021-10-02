@@ -80,11 +80,14 @@ EOF
 		sudo systemctl daemon-reload
 	fi
 	if ! /root/.local/share/solana/install/active_release/bin/solana --version | grep -q $solana_version; then
+		printf_n "${C_LGn}Updating the node...${RES}"
 		/root/.local/share/solana/install/active_release/bin/solana-install init "v${solana_version}"
 		/root/.local/share/solana/install/active_release/bin/solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window && \
 		sudo systemctl stop solana && \
 		sudo systemctl restart sstd && \
-		sudo systemctl restart solana
+		sudo systemctl restart solana && \
+		printf_n "${C_LGn}Done!${RES}"
+	else
+		printf_n "${C_LGn}The node version is current!${RES}"
 	fi
 fi
-return 0 2>/dev/null; exit 0
