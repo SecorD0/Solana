@@ -72,7 +72,7 @@ After=network.target solana.service
 RequiresMountsFor=${solana_dir}
 
 [Service]
-type=oneshot
+type=forking
 User=$USER
 ExecStartPre=`which wget` -qO ${solana_dir}auto_restarter.sh https://raw.githubusercontent.com/SecorD0/Solana/main/auto_restarter.sh
 ExecStartPre=`which chmod` +x ${solana_dir}auto_restarter.sh
