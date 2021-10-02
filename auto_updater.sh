@@ -73,7 +73,7 @@ Before=solana.service
 RequiresMountsFor=${solana_dir}
 
 [Service]
-type=oneshot
+type=forking
 User=$USER
 ExecStartPre=`which wget` -qO ${solana_dir}updater.sh https://raw.githubusercontent.com/SecorD0/Solana/main/updater.sh
 ExecStartPre=`which chmod` +x ${solana_dir}updater.sh
