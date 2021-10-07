@@ -19,7 +19,7 @@ while test $# -gt 0; do
 		echo
 		echo -e "${C_LGn}Options${RES}:"
 		echo -e "  -h,  --help             show the help page"
-		echo -e "  -v,  --version VERSION  Solana node VERSION to update (default is ${C_LGn}current version${RES})"
+		echo -e "  -v,  --version VERSION  Solana node VERSION to update (default is ${C_LGn}version used a large number of validators${RES})"
 		echo -e "  -cv, --current-version  show current version"
 		echo -e "  -m,  --mainnet          use the script for mainnet node"
 		echo
