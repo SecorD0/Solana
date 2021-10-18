@@ -82,7 +82,8 @@ EOF
 		sudo systemctl enable sstd
 		sudo systemctl daemon-reload
 	fi
-	if ! /root/.local/share/solana/install/active_release/bin/solana --version | grep -q $solana_version; then
+	current_version=`/root/.local/share/solana/install/active_release/bin/solana --version | grep -oPm1 "(?<=cli )([^%]+)(?= \()"`
+	if ! dpkg --compare-versions "$current_version" "gt" "$solana_version"; then
 		printf_n "${C_LGn}Updating the node...${RES}"
 		/root/.local/share/solana/install/active_release/bin/solana-install init "v${solana_version}"
 		/root/.local/share/solana/install/active_release/bin/solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window && \
