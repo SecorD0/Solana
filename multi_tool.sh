@@ -37,7 +37,6 @@ else
 		sudo apt update
 		sudo apt upgrade -y
 		solana_version=`. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/parsers/xpath.sh) -x "normalize-space(/html/body/main/div[5]/div[2]/div/div/div/div[3]/div/text())" -u https://www.validators.app/cluster-stats/testnet`
-		current_version=`solana --version | grep -oPm1 "(?<=cli )([^%]+)(?= \()"`
 		. <(wget -qO- "https://release.solana.com/v${solana_version}/install")
 		. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n "PATH" -v "/root/.local/share/solana/install/active_release/bin:$PATH"
 	fi
