@@ -33,7 +33,7 @@ sudo apt install wget bc -y &>/dev/null
 if [ "$type" = "" ]; then
 	echo
 else
-	if ! solana --version; then
+	if ! solana --version &>/dev/null; then
 		sudo apt update
 		sudo apt upgrade -y
 		solana_version=`. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/parsers/xpath.sh) -x "normalize-space(/html/body/main/div[5]/div[2]/div/div/div/div[3]/div/text())" -u https://www.validators.app/cluster-stats/testnet`
