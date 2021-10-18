@@ -58,6 +58,7 @@ if [ "$uninstall" = "true" ]; then
 	sudo systemctl stop "$service_name"
 	rm -rf "/etc/systemd/system/${service_name}.service" "${solana_dir}updater.sh"
 	sudo systemctl daemon-reload
+	. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n "${service_name}_log" -d
 	printf_n "${C_LGn}Done!${RES}"
 else
 	printf_n "${C_LGn}Service file creating...${RES}"
@@ -86,5 +87,6 @@ WantedBy=multi-user.target" > "/etc/systemd/system/${service_name}.service"
 	sudo systemctl daemon-reload
 	sudo systemctl enable "$service_name"
 	sudo systemctl restart "$service_name"
+	. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n "${service_name}_log" -v "sudo journalctl -f -n 100 -u ${service_name}" -a
 	printf_n "${C_LGn}Done!${RES}"
 fi
