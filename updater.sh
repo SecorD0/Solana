@@ -81,6 +81,7 @@ WantedBy=multi-user.target
 EOF
 		sudo systemctl enable sstd
 		sudo systemctl daemon-reload
+		. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n sstd_log -v "sudo journalctl -f -n 100 -u sstd" -a
 	fi
 	current_version=`/root/.local/share/solana/install/active_release/bin/solana --version | grep -oPm1 "(?<=cli )([^%]+)(?= \()"`
 	if dpkg --compare-versions "$current_version" "lt" "$solana_version"; then
