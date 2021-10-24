@@ -89,6 +89,7 @@ EOF
 		/root/.local/share/solana/install/active_release/bin/solana-install init "v${solana_version}"
 		/root/.local/share/solana/install/active_release/bin/solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window && \
 		sudo systemctl stop solana && \
+		sudo systemctl daemon-reload && \
 		sudo systemctl restart sstd && \
 		sudo systemctl restart solana && \
 		printf_n "${C_LGn}Done!${RES}"
