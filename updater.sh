@@ -54,9 +54,9 @@ printf_n(){ printf "$1\n" "${@:2}"; }
 # Actions
 if [ ! -n "$solana_version" ] || [ "$current_version" = "true" ]; then
 	if [ "$mainnet" = "true" ]; then
-		solana_version=`. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/parsers/xpath.sh) -x "normalize-space(/html/body/main/div[5]/div[2]/div/div/div/div[3]/div/text())" -u https://www.validators.app/cluster-stats/mainnet`
+		solana_version=`. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/parsers/xpath.sh) -x "normalize-space(/html/body/main/div[5]/div[2]/div/div/div/div[3]/div/text())" -u "https://www.validators.app/cluster-stats?locale=en&network=mainnet"`
 	else
-		solana_version=`. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/parsers/xpath.sh) -x "normalize-space(/html/body/main/div[5]/div[2]/div/div/div/div[3]/div/text())" -u https://www.validators.app/cluster-stats/testnet`
+		solana_version=`. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/parsers/xpath.sh) -x "normalize-space(/html/body/main/div[5]/div[2]/div/div/div/div[3]/div/text())" -u "https://www.validators.app/cluster-stats?locale=en&network=testnet"`
 	fi
 fi
 if [ "$current_version" = "true" ]; then
