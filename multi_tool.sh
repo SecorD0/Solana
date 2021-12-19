@@ -105,8 +105,8 @@ LimitNOFILE=65535
 
 [Install]
 WantedBy=multi-user.target" > /etc/systemd/system/sstd.service
-			sudo systemctl enable sstd
 			sudo systemctl daemon-reload
+			sudo systemctl enable sstd
 			. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n sstd_log -v "sudo journalctl -fn 100 -u sstd" -a
 		fi
 		local current_version=`solana --version | grep -oPm1 "(?<=cli )([^%]+)(?= \()"`
