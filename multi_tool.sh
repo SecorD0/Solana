@@ -114,7 +114,7 @@ WantedBy=multi-user.target" > /etc/systemd/system/sstd.service
 			solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window && \
 			sudo systemctl stop solana && \
 			sudo systemctl daemon-reload && \
-			sudo systemctl restart sstd && \
+			sudo systemctl restart sstd; \
 			sudo systemctl restart solana && \
 			printf_n "${C_LGn}Done!${RES}"
 		else
