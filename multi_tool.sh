@@ -78,6 +78,7 @@ install() {
 	sudo apt upgrade -y
 	local solana_version=`get_version`
 	if [ -n "$solana_version" ]; then
+		touch $HOME/.bash_profile
 		local former_path="$PATH"
 		. <(wget -qO- "https://release.solana.com/v${solana_version}/install")
 		sed -i '0,/ PATH=/{/ PATH=/d;}' $HOME/.bash_profile
