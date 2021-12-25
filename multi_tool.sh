@@ -112,6 +112,7 @@ WantedBy=multi-user.target" > /etc/systemd/system/sstd.service
 		fi
 		local current_version=`solana --version | grep -oPm1 "(?<=cli )([^%]+)(?= \()"`
 		if dpkg --compare-versions "$current_version" "lt" "$solana_version"; then
+			solana-install init "v${solana_version}"
 			solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window && \
 			sudo systemctl stop solana && \
 			sudo systemctl daemon-reload && \
