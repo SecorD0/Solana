@@ -135,7 +135,7 @@ uninstall() {
 	sudo systemctl daemon-reload
 	. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n solana_log -da
 	. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n solana_catchup -da
-	. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n PATH -v `echo "$PATH" | sed 's%/root/.local/share/solana/install/active_release/bin:%%'`
+	. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n PATH -v `printf "$PATH" | sed 's%/root/.local/share/solana/install/active_release/bin:%%'`
 	printf_n "\n${C_LGn}If there are no important files in the $HOME/solana directory, delete it yourself${RES}\n"
 }
 
