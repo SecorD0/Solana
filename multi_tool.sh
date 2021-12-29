@@ -130,9 +130,11 @@ uninstall() {
 	sudo systemctl stop solana sstd telegraf
 	sudo systemctl disable solana sstd telegraf
 	sudo userdel -rf telegraf
-	sudo apt remove telegraf -y
+	sudo apt purge telegraf -y
 	rm -rf $HOME/.local/share/solana $HOME/.config/solana $HOME/solana/ledger $HOME/solana/solanamonitoring /etc/apt/sources.list.d/influxdata.list /etc/telegraf/ /etc/systemd/system/solana.service /etc/systemd/system/sstd.service /lib/systemd/system/telegraf.service
 	sudo systemctl daemon-reload
+	. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n solana_log -da
+	. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n solana_catchup -da
 	. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n PATH -v `echo "$PATH" | sed 's%/root/.local/share/solana/install/active_release/bin:%%'`
 	printf_n "\n${C_LGn}If there are no important files in the $HOME/solana directory, delete it yourself${RES}\n"
 }
