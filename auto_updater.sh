@@ -52,7 +52,7 @@ done
 # Functions
 printf_n(){ printf "$1\n" "${@:2}"; }
 # Actions
-solana_dir=`cat /etc/systemd/system/solana.service | grep -oPm1 "(?<=--ledger )([^%]+)(?=ledger)"`
+solana_dir=`grep -oPm1 "(?<=--ledger )([^%]+)(?=ledger)" /etc/systemd/system/solana.service`
 if [ "$uninstall" = "true" ]; then
 	printf_n "${C_LGn}Uninstalling...${RES}"
 	sudo systemctl stop "$service_name"
