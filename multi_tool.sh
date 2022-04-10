@@ -83,7 +83,7 @@ leader_slot() {
 		local seconds=`bc <<< "$seconds_remaining-$hours*3600-$minutes*60"`
 		printf "   ${C_LGn}%d${RES} hr. ${C_LGn}%.0f${RES} min. ${C_LGn}%.0f${RES} sec.       \r" "$hours" "$minutes" "$seconds"
 		if [ -n "$1" ] && [ "$slots_remaining" -ge 3922 ]; then
-			printf_n
+			printf_n "\n"
 			sleep 10
 			break		
 		fi
@@ -117,7 +117,7 @@ install() {
 	fi
 }
 update() {
-	leader_slot update
+	sudo apt install jq -y &>/dev/null
 	local solana_version=`get_version`
 	if [ -n "$solana_version" ]; then
 		if [ ! -f /etc/systemd/system/sstd.service ]; then
@@ -139,8 +139,11 @@ WantedBy=multi-user.target" > /etc/systemd/system/sstd.service
 			sudo systemctl enable sstd
 			. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n sstd_log -v "sudo journalctl -fn 100 -u sstd" -a
 		fi
-		local current_version=`solana --version | grep -oPm1 "(?<=cli )([^%]+)(?= \()"`
+		local validators=`solana validators -ul --output json-compact`
+		local vote_account=`solana validators -ul --output json-compact | jq -r 'first (.validators[] | select(.identityPubkey == "'$(solana address)'")) | .voteAccountPubkey'`
+		local current_version=`jq -r '.validators[] | select(.voteAccountPubkey == "'$vote_account'").version' <<< "$validators"`
 		if dpkg --compare-versions "$current_version" "lt" "$solana_version"; then
+			leader_slot update
 			solana-install init "v${solana_version}"
 			solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window && \
 			sudo systemctl stop solana && \
