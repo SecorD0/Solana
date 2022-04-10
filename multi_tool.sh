@@ -2,6 +2,7 @@
 # Default variables
 function="install"
 solana_version=""
+unsafe="false"
 mainnet="false"
 
 # Options
@@ -18,8 +19,10 @@ while test $# -gt 0; do
 		echo
 		echo -e "${C_LGn}Options${RES}:"
 		echo -e "  -h,  --help             show the help page"
+		echo -e "  -ls                     shows the time of the next leader slot"
 		echo -e "  -gv, --get-version      show current a node version"
-		echo -e "  -up, --update           update the node"
+		echo -e "  -up, --update           update the node if the next leader slot is more than 15 minutes away"
+		echo -e "  -us, --unsafe           update the node anyway"
 		echo -e "  -v,  --version VERSION  the node VERSION to install/update (default is ${C_LGn}version used a large number of validators${RES})"
 		echo -e "  -m,  --mainnet          use version getting and updating for a mainnet node"
 		echo -e "  -un, --uninstall        uninstall the node (${C_LGn}doesn't delete $HOME/solana directory${RES})"
@@ -32,12 +35,20 @@ while test $# -gt 0; do
 		echo
 		return 0 2>/dev/null; exit 0
 		;;
+	-ls)
+		function="leader_slot"
+		shift
+		;;
 	-gv|--get-version)
 		function="get_version"
 		shift
 		;;
 	-up|--update)
 		function="update"
+		shift
+		;;
+	-us|--unsafe)
+		unsafe="true"
 		shift
 		;;
 	-v*|--version*)
@@ -61,6 +72,22 @@ done
 
 # Functions
 printf_n(){ printf "$1\n" "${@:2}"; }
+leader_slot() {
+	sudo apt install wget bc -y &>/dev/null
+	printf_n "The next leader slot will be in:"
+	while true; do
+		local slots_remaining=`tail -n10000 $HOME/solana/solana.log | awk -v pattern="$(solana address).+within slot" '$0 ~ pattern {printf "%d\n", $18-$12}' | tail -n1`
+		local hours=`bc <<< "$slots_remaining*0.459/3600"`
+		local minutes=`bc <<< "$slots_remaining*0.459/60-$hours*60"`
+		local seconds=`bc <<< "$slots_remaining*0.459-$minutes*60"`
+		printf " ${C_LGn}%.0f${RES} hr. ${C_LGn}%.0f${RES} min. ${C_LGn}%.0f${RES} sec.       \r" "$hours" "$minutes" "$seconds"
+		if [ -n "$0" ] && [ "$slots_remaining" -ge 3922 ]; then
+			printf_n
+			sleep 10
+			break		
+		fi
+	done
+}
 get_version() {
 	if [ -n "$solana_version" ]; then
 		printf_n "$solana_version"
@@ -89,6 +116,7 @@ install() {
 	fi
 }
 update() {
+	leader_slot update
 	local solana_version=`get_version`
 	if [ -n "$solana_version" ]; then
 		if [ ! -f /etc/systemd/system/sstd.service ]; then
