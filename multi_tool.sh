@@ -142,6 +142,9 @@ WantedBy=multi-user.target" > /etc/systemd/system/sstd.service
 		local validators=`solana validators -ul --output json-compact`
 		local vote_account=`solana validators -ul --output json-compact | jq -r 'first (.validators[] | select(.identityPubkey == "'$(solana address)'")) | .voteAccountPubkey'`
 		local current_version=`jq -r '.validators[] | select(.voteAccountPubkey == "'$vote_account'").version' <<< "$validators"`
+		if [ ! -n "$current_version" ]; then
+			local current_version=`solana --version | grep -oPm1 "(?<=cli )([^%]+)(?= \()"`
+		fi		
 		if dpkg --compare-versions "$current_version" "lt" "$solana_version"; then
 			leader_slot update
 			solana-install init "v${solana_version}"
