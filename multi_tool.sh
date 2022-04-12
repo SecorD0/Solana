@@ -140,7 +140,7 @@ WantedBy=multi-user.target" > /etc/systemd/system/sstd.service
 			. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n sstd_log -v "sudo journalctl -fn 100 -u sstd" -a
 		fi
 		local validators=`solana validators -ul --output json-compact`
-		local vote_account=`solana validators -ul --output json-compact | jq -r 'first (.validators[] | select(.identityPubkey == "'$(solana address)'")) | .voteAccountPubkey'`
+		local vote_account=`jq -r 'first (.validators[] | select(.identityPubkey == "'$(solana address)'")) | .voteAccountPubkey' <<< "$validators"`
 		local current_version=`jq -r '.validators[] | select(.voteAccountPubkey == "'$vote_account'").version' <<< "$validators"`
 		if [ ! -n "$current_version" ]; then
 			local current_version=`solana --version | grep -oPm1 "(?<=cli )([^%]+)(?= \()"`
