@@ -147,6 +147,7 @@ WantedBy=multi-user.target" > /etc/systemd/system/sstd.service
 		fi		
 		if dpkg --compare-versions "$current_version" "lt" "$solana_version"; then
 			leader_slot update
+			printf_n "${C_LGn}Node updating...${RES}"
 			solana-install init "v${solana_version}"
 			solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window && \
 			sudo systemctl stop solana && \
