@@ -149,7 +149,7 @@ WantedBy=multi-user.target" > /etc/systemd/system/sstd.service
 			leader_slot update
 			printf_n "${C_LGn}Node updating...${RES}"
 			solana-install init "v${solana_version}"
-			solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window && \
+			solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window --max-delinquent-stake 10 && \
 			sudo systemctl stop solana && \
 			sudo systemctl daemon-reload && \
 			sudo systemctl restart sstd; \
