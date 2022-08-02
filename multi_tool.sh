@@ -77,10 +77,10 @@ leader_slot() {
 	printf_n "The next leader slot will be in:"
 	while true; do
 		local slots_remaining=`tail -n10000 $HOME/solana/solana.log | awk -v pattern="$(solana address).+within slot" '$0 ~ pattern {printf "%d\n", $18-$12}' | tail -1`
-		local seconds_remaining=`bc <<< "$slots_remaining*0.5"`
-		local hours=`bc <<< "$seconds_remaining/3600"`
-		local minutes=`bc <<< "$seconds_remaining/60-$hours*60"`
-		local seconds=`bc <<< "$seconds_remaining-$hours*3600-$minutes*60"`
+		local seconds_remaining=`bc <<< "$slots_remaining*0.5" 2>/dev/null`
+		local hours=`bc <<< "$seconds_remaining/3600" 2>/dev/null`
+		local minutes=`bc <<< "$seconds_remaining/60-$hours*60" 2>/dev/null`
+		local seconds=`bc <<< "$seconds_remaining-$hours*3600-$minutes*60" 2>/dev/null`
 		printf "   ${C_LGn}%d${RES} hr. ${C_LGn}%.0f${RES} min. ${C_LGn}%.0f${RES} sec.       \r" "$hours" "$minutes" "$seconds"
 		if [ -n "$1" ] && [ "$slots_remaining" -ge 3922 ]; then
 			printf_n "\n"
