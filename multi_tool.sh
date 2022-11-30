@@ -83,7 +83,7 @@ leader_slot() {
 		local minutes=`bc <<< "$seconds_remaining/60-$hours*60" 2>/dev/null`
 		local seconds=`bc <<< "$seconds_remaining-$hours*3600-$minutes*60" 2>/dev/null`
 		printf "   ${C_LGn}%d${RES} hr. ${C_LGn}%.0f${RES} min. ${C_LGn}%.0f${RES} sec.       \r" "$hours" "$minutes" "$seconds"
-		if [ -n "$1" ] && [ "$slots_remaining" -ge 3922 ]; then
+		if [ "$unsafe" == "true" ] || ([ -n "$1" ] && [ "$slots_remaining" -ge 3922 ]); then
 			printf_n "\n"
 			sleep 10
 			break		
