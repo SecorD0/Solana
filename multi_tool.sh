@@ -121,25 +121,6 @@ update() {
 	sudo apt install jq -y &>/dev/null
 	local solana_version=`get_version`
 	if [ -n "$solana_version" ]; then
-		if [ ! -f /etc/systemd/system/sstd.service ]; then
-			printf_n "[Unit]
-Description=Solana System Tuning
-After=network.target
-Before=solana.service
-
-[Service]
-User=$USER
-ExecStart=`which solana-sys-tuner` --user $USER
-Restart=on-failure
-RestartSec=3
-LimitNOFILE=65535
-
-[Install]
-WantedBy=multi-user.target" > /etc/systemd/system/sstd.service
-			sudo systemctl daemon-reload
-			sudo systemctl enable sstd
-			. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n sstd_log -v "sudo journalctl -fn 100 -u sstd" -a
-		fi
 		local validators=`solana validators -ul --output json-compact`
 		local vote_account=`jq -r 'first (.validators[] | select(.identityPubkey == "'$(solana address)'")) | .voteAccountPubkey' <<< "$validators"`
 		local current_version=`jq -r '.validators[] | select(.voteAccountPubkey == "'$vote_account'").version' <<< "$validators"`
@@ -153,7 +134,6 @@ WantedBy=multi-user.target" > /etc/systemd/system/sstd.service
 			solana-validator --ledger $HOME/solana/ledger/ wait-for-restart-window --max-delinquent-stake 10 && \
 			sudo systemctl stop solana && \
 			sudo systemctl daemon-reload && \
-			sudo systemctl restart sstd; \
 			sudo systemctl restart solana && \
 			printf_n "${C_LGn}Done!${RES}"
 		else
@@ -164,11 +144,11 @@ WantedBy=multi-user.target" > /etc/systemd/system/sstd.service
 	fi
 }
 uninstall() {
-	sudo systemctl stop solana sstd telegraf
-	sudo systemctl disable solana sstd telegraf
+	sudo systemctl stop solana telegraf
+	sudo systemctl disable solana telegraf
 	sudo userdel -rf telegraf
 	sudo apt purge telegraf -y
-	rm -rf $HOME/.local/share/solana $HOME/.config/solana $HOME/solana/ledger $HOME/solana/solanamonitoring /etc/apt/sources.list.d/influxdata.list /etc/telegraf/ /etc/systemd/system/solana.service /etc/systemd/system/sstd.service /lib/systemd/system/telegraf.service
+	rm -rf $HOME/.local/share/solana $HOME/.config/solana $HOME/solana/ledger $HOME/solana/solanamonitoring /etc/apt/sources.list.d/influxdata.list /etc/telegraf/ /etc/systemd/system/solana.service /lib/systemd/system/telegraf.service
 	sudo systemctl daemon-reload
 	. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n solana_log -da
 	. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n solana_catchup -da
